@@ -1,9 +1,10 @@
 require("dotenv").config();
 
 const express = require('express');
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const cors = require('cors');
 const userRoutes = require('./routes/user');
+const verificationRoutes = require('./routes/verify')
 
 //Load env variables
 const mongo_URI = process.env.MONGO_URI;
@@ -26,6 +27,8 @@ app.use(express.json());
 
 //Routes
 app.use('/users', userRoutes);
+
+app.use('/verify', verificationRoutes);
 
 app.use('/', (req, res) => {
     res.send('User Auth system');

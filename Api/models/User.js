@@ -38,6 +38,10 @@ const UserSchema = new Schema({
     address: {
         type: Schema.Types.ObjectId,
         ref: 'Address'
+    },
+    isPhoneVerified: {
+        type: Boolean,
+        default: false,
     }
 });
 

@@ -33,7 +33,8 @@ exports.registerUser = async (req, res) => {
             password: encryptedPassword,
             number: req.body.mobile,
             dob: req.body.dob,
-            address: address._id
+            address: address._id,
+            isPhoneVerified: false
         });
 
         res.status(201).json(userDoc);
@@ -61,6 +62,7 @@ exports.loginUser = async (req, res) => {
                 id: user._id,
                 email,
                 token,
+                isPhoneVerified: user.isPhoneVerified
             });
         } else {
             res.status(400).json("Wrong Credentials");
@@ -90,7 +92,8 @@ exports.getProfile = async (req, res) => {
             lastname: user.lastname,
             number: user.number,
             dob: user.dob,
-            address: user.address
+            address: user.address,
+            isPhoneVerified: user.isPhoneVerified
         });
     } catch (error) {
         return res.status(400).json({ message: 'Error fetching profile', error: error.message });
