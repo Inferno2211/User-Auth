@@ -1,51 +1,69 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-const API_URL = process.env.REACT_APP_API_URL || '';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from 'jwt-decode';
+import GoogleLogin from "../components/GoogleLogin";
+const API_URL = process.env.REACT_APP_API_URL || "";
 
 const SignupPage = () => {
-    const [error, setError] = useState('');
+    const [error, setError] = useState("");
     const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-        firstname: '',
-        lastname: '',
-        mobile: '',
-        dob: '',
-        addressInfo: '',
-        city: '',
-        state: '',
-        pincode: ''
+        email: "",
+        password: "",
+        firstname: "",
+        lastname: "",
+        mobile: "",
+        dob: "",
+        addressInfo: "",
+        city: "",
+        state: "",
+        pincode: "",
     });
 
     const navigate = useNavigate();
 
     const handleChange = (e) => {
-        setFormData(prev => ({
+        setFormData((prev) => ({
             ...prev,
-            [e.target.name]: e.target.value
+            [e.target.name]: e.target.value,
         }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const endpoint = '/users/signup';
+        console.log(formData);
+        const endpoint = "/users/signup";
         try {
             const response = await fetch(API_URL + endpoint, {
-                method: 'POST',
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(formData),
             });
 
             const data = await response.json();
-            if (!response.ok) throw new Error(data.msg || 'An error occurred');
+            if (!response.ok) throw new Error(data.msg || "An error occurred");
 
-            navigate('/verify', { state: { userId: data.email } });
+            navigate("/verify", { state: { userId: data.email, number:data.number } });
 
-            setError('');
+            setError("");
         } catch (err) {
             setError(err.message);
+        }
+    };
+
+    const handleGoogleResponse = (response) => {
+        try {
+            const decoded = jwtDecode(response.credential);
+            console.log(decoded)
+            setFormData((prev) => ({
+                ...prev,
+                email: decoded.email,
+                firstname: decoded.given_name,
+                lastname: decoded.family_name,
+            }));
+        } catch (err) {
+            console.error("Error decoding Google token", err);
         }
     };
 
@@ -62,6 +80,7 @@ const SignupPage = () => {
                     value={formData.email}
                     onChange={handleChange}
                     required
+                    disabled={formData.email !== ""}
                 />
                 <input
                     type="password"
@@ -77,6 +96,8 @@ const SignupPage = () => {
                     placeholder="First Name"
                     value={formData.firstname}
                     onChange={handleChange}
+                    required
+                    disabled={formData.firstname !== ""}
                 />
                 <input
                     type="text"
@@ -84,6 +105,8 @@ const SignupPage = () => {
                     placeholder="Last Name"
                     value={formData.lastname}
                     onChange={handleChange}
+                    required
+                    disabled={formData.lastname !== ""}
                 />
                 <input
                     type="tel"
@@ -91,6 +114,7 @@ const SignupPage = () => {
                     placeholder="Mobile Number"
                     value={formData.mobile}
                     onChange={handleChange}
+                    required
                 />
                 <input
                     type="date"
@@ -104,6 +128,7 @@ const SignupPage = () => {
                     placeholder="Address"
                     value={formData.addressInfo}
                     onChange={handleChange}
+                    required
                 />
                 <input
                     type="text"
@@ -111,6 +136,7 @@ const SignupPage = () => {
                     placeholder="City"
                     value={formData.city}
                     onChange={handleChange}
+                    required
                 />
                 <input
                     type="text"
@@ -118,6 +144,7 @@ const SignupPage = () => {
                     placeholder="State"
                     value={formData.state}
                     onChange={handleChange}
+                    required
                 />
                 <input
                     type="text"
@@ -125,16 +152,17 @@ const SignupPage = () => {
                     placeholder="Pincode"
                     value={formData.pincode}
                     onChange={handleChange}
+                    required
                 />
                 <button type="submit">Register</button>
             </form>
 
-            <button
-                className="switch-mode"
-                onClick={() => navigate('/login')}
-            >
+            <button className="switch-mode" onClick={() => navigate("/login")}>
                 Have an account?
             </button>
+            <GoogleLogin
+                callback={handleGoogleResponse}
+            />
         </div>
     );
 };

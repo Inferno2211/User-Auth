@@ -13,9 +13,9 @@ const PhoneVerification = () => {
     const [codeSent, setCodeSent] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
-    const [user, setUser] = useState(null);
 
     const userId = location.state?.userId;
+    const number = location.state?.number;
 
     useEffect(() => {
         if (!userId) {
@@ -30,7 +30,10 @@ const PhoneVerification = () => {
 
     const fetchProfile = async () => {
         const token = localStorage.getItem('token');
-        if (!token) return;
+        if (!token) {
+            setIsEditing(true);
+            return;
+        }
 
         try {
             console.log('running')
@@ -41,14 +44,14 @@ const PhoneVerification = () => {
             });
             if (response.ok) {
                 const data = await response.json();
-                setUser(data);
                 setPhoneNumber(data.number)
+                console.log(data)
 
                 if (data.isPhoneVerified) {
                     navigate('/profile', { state: { userId: data.id } });
                     return;
                 }
-                else{
+                else {
                     sendVerificationCode(data.number);
                 }
             }
@@ -119,9 +122,9 @@ const PhoneVerification = () => {
                     <h2 style={{ textAlign: 'center', fontSize: '24px', fontWeight: 'bold', color: '#333' }}>
                         Verify Your Phone Number
                     </h2>
-                    <p>Code sent to: +91 {phoneNumber}</p>
+                    
                     <p style={{ textAlign: 'center', fontSize: '14px', color: '#777' }}>
-                        {codeSent ? 'Enter the verification code sent to your phone' : ''}
+                        {codeSent ? <p>Code sent to: +91 {phoneNumber}</p> : ''}
                     </p>
                 </div>
 
