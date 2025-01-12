@@ -3,6 +3,9 @@ require("dotenv").config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const session = require('express-session');
+const passport = require('passport');
+
 const userRoutes = require('./routes/user');
 const verificationRoutes = require('./routes/verify')
 
@@ -24,6 +27,21 @@ const app = express();
 //Middleware
 app.use(cors({ credentials: true, origin: origin }));
 app.use(express.json());
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser((user, done) => {
+    done(null, user);
+});
+
+passport.deserializeUser((user, done) => {
+    done(null, user);
+});
 
 //Routes
 app.use('/users', userRoutes);
