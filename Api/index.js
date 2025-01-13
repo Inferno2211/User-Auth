@@ -8,6 +8,7 @@ const passport = require('passport');
 
 const userRoutes = require('./routes/user');
 const verificationRoutes = require('./routes/verify')
+const linkedinRoutes = require('./routes/linkedinAuth')
 
 //Load env variables
 const mongo_URI = process.env.MONGO_URI;
@@ -47,6 +48,8 @@ passport.deserializeUser((user, done) => {
 app.use('/users', userRoutes);
 
 app.use('/verify', verificationRoutes);
+
+app.use('/linkedin', linkedinRoutes);
 
 app.use('/', (req, res) => {
     res.send('User Auth system');
